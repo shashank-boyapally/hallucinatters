@@ -3,8 +3,7 @@ import argparse
 import warnings
 
 from langchain.chains import LLMChain
-from langchain.prompts.prompt import PromptTemplate 
-from langchain.prompts.few_shot import FewShotPromptTemplate
+from langchain.prompts import PromptTemplate
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.vector_stores.faiss import FaissVectorStore
@@ -60,6 +59,42 @@ if __name__ == '__main__':
     Settings.node_parser=node_parser
     Settings.prompt_helper=prompt_helper
 
+    server_url = "https://llama-2-7b-chat-perfconf-hackathon.apps.dripberg-dgx2.rdu3.labs.perfscale.redhat.com"
+    hyde_llm = HuggingFaceTextGenInference(
+        inference_server_url=server_url,
+        max_new_tokens=2000,
+        top_k=50,
+        top_p=0.99,
+        typical_p=0.99,
+        temperature=1,
+        repetition_penalty=1.03,
+        do_sample=True,
+    )
+
+    hyde_prompt = """
+    <question>
+    Please generate a well-structured and informative document that answers the following question in a hypothetical but relevant manner:
+    <question_text>
+
+    The generated document should follow this outline:
+
+    1. Introduction to the topic and its relevance
+    2. Key points or sections to be covered in the document
+    - Point 1
+    - Point 2
+    - ...
+    3. Additional aspects or considerations
+    4. Conclusion and future outlook
+
+    Please provide a well-written and engaging document that covers the outlined points, with examples, insights, and meaningful content related to the question. The document should be hypothetical but still relevant and informative.
+    </question>
+    """
+
+    # Replace <question_text> with your actual question
+    print("Generating hypothetical document...")
+    hyde_prompt = hyde_prompt.replace("<question_text>", args.query)
+    generated_document = hyde_llm(hyde_prompt)
+
     print("Setting up storage context for index load...")
     vector_store = FaissVectorStore.from_persist_dir(args.persist_dir)
     storage_context = StorageContext.from_defaults(
@@ -84,7 +119,7 @@ if __name__ == '__main__':
         retriever=ret,
         response_synthesizer=response_syn,
     )
-    response = query_engine.query(args.query)
+    response = query_engine.query(generated_document)
     file_dict=dict()
     for context in response.source_nodes:
         file_path = context.metadata.get('file_path')
@@ -102,7 +137,7 @@ if __name__ == '__main__':
         top_k=10,
         top_p=0.5,
         typical_p=0.5,
-        temperature=0.05,
+        temperature=0.01,
         repetition_penalty=1.03,
         streaming=True,
     )
@@ -127,14 +162,14 @@ if __name__ == '__main__':
 
     # Create the prompt template instance
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-
-    # prompt = few_shot_prompt.format(context=context, question=args.query)
-    # print(prompt)
     llm_chain = LLMChain(llm=llm, prompt=prompt)
     response = llm_chain.invoke({"context": context, "question": args.query})
     print("==================================================================")
     print("RAW RESPONSE:")
     print(response)
+    print("==================================================================")
+    print("GENERATED HYPOTHETICAL DOCUMENT:")
+    print(generated_document)
     print("==================================================================")
     print("QUESTION:")
     print(response["question"])
