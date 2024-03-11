@@ -3,3 +3,4 @@ hallucinatters_rag_docs
 __pycache__
 myenv
 *.csv
+venv/
