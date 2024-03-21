@@ -10,7 +10,7 @@ print("Loaded documents from rag for evaluation")
 
 # generator with openai models
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = ""
 generator = TestsetGenerator.with_openai(generator_llm="gpt-3.5-turbo")
 
 # generate testset

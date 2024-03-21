@@ -5,7 +5,7 @@ import pandas as pd
 from datasets import Dataset
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = ""
 from ragas.metrics import (
     faithfulness,
     answer_relevancy,

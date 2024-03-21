@@ -35,14 +35,14 @@ class Rag:
         )
 
         os.environ['KMP_DUPLICATE_LIB_OK']='True'
-        os.environ['OPENAI_API_KEY'] = "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"
+        os.environ['OPENAI_API_KEY'] = ""
         embed_model = args.model if args.model else OpenAIEmbedding()
         Settings.llm=None
         Settings.embed_model=embed_model
         Settings.node_parser=node_parser
         Settings.prompt_helper=prompt_helper
 
-        server_url = "https://llama-2-7b-chat-perfconf-hackathon.apps.dripberg-dgx2.rdu3.labs.perfscale.redhat.com"
+        server_url = ""
         self.llm = HuggingFaceTextGenInference(
             inference_server_url=server_url,
             max_new_tokens=512,

@@ -10,7 +10,7 @@ from llama_index.prompts import PromptTemplate
 import os
 
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = ""
 
 import pandas as pd
 
